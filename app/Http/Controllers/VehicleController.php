@@ -12,12 +12,15 @@ class VehicleController extends Controller
 
     public function __construct()
     {
+        parent::__construct();
         $this->vehicle = new Vehicle();
     }
 
     public function index(Request $request)
     {
         $query = Vehicle::query();
+
+        $appUrl = $this->appUrl;
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -30,7 +33,7 @@ class VehicleController extends Controller
         }
 
         $vehicles = $query->paginate(10);
-        return view('vehicles.index', compact('vehicles'));
+        return view('vehicles.index', compact('vehicles', 'appUrl'));
     }
 
     public function checkIfExists($idExternal)
@@ -87,17 +90,28 @@ class VehicleController extends Controller
 
     public function destroy($id)
     {
-        $this->vehicle->where('id', $id)->delete();
-        return redirect()->route('vehicles.index');
+        try {
+            Vehicle::findOrFail($id)->delete();
+            return redirect()->route('vehicles.index')->with('success', 'Veículo deletado com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao deletar veículo: ' . $e->getMessage());
+        }
     }
+    
 
     public function getWebMotors()
     {
-        return view('api.webmotors');
+        $appUrl = $this->appUrl;
+        $appPort = $this->appPort;
+
+        return view('api.webmotors', compact('appUrl', 'appPort'));
     }
 
     public function getRevendaMais()
     {
-        return view('api.revendaMais');
+        $appUrl = $this->appUrl;
+        $appPort = $this->appPort;
+
+        return view('api.revendaMais', compact('appUrl', 'appPort'));
     }
 }

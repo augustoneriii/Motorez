@@ -11,7 +11,7 @@ class MockApiController extends Controller
 {
     public function store(Request $request)
     {
-        $importService = new ImportService();
+        $importService = new ImportService($this->appUrl, $this->appPort);
         return $importService->Import($request);
     }
 
@@ -134,7 +134,7 @@ class MockApiController extends Controller
             <marca>Volkswagen</marca>
             <modelo>T-Cross</modelo>
             <ano>2022</ano>
-            <versao>Comfortline</versao>
+            <versao>Comfortline</ano>
             <cor>Preto</cor>
             <quilometragem>30000</quilometragem>
             <tipoCombustivel>Gasolina</tipoCombustivel>

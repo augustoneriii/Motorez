@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('table-search');
     const vehicleList = document.getElementById('vehicle-list');
+    const appUrl = window.appUrl;
 
     searchInput.addEventListener('input', function () {
         let searchText = searchInput.value.toLowerCase();
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let row;
 
     function checkVehicleExistence(vehicle) {
-        fetch(`http://127.0.0.1:8000/vehicles/check/${vehicle.id}`)
+        fetch(`${appUrl}/vehicles/check/${vehicle.id}`)
             .then(response => response.json())
             .then(data => {
                 addVehicleToTable(vehicle, data.exists);
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('vehicle-list').insertAdjacentHTML('beforeend', row);
     }
 
-    fetch('http://127.0.0.1:8000/api/v1/estoque')
+    fetch(`${appUrl}/api/v1/estoque`)
         .then(response => response.json())
         .then(data => {
             let vehicles = data.veiculos;
@@ -89,13 +90,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     document.getElementById('import-button').addEventListener('click', function () {
-        fetch('http://127.0.0.1:8000/api/v1/estoque')
+        fetch(`${appUrl}/api/v1/estoque`)
             .then(response => response.json())
             .then(data => {
                 let vehicles = data.veiculos;
                 let promises = vehicles.map(vehicle => {
                     vehicle.origem = 'Web Motors';
-                    return fetch('http://127.0.0.1:8000/api/mockApi/store', {
+                    return fetch(`${appUrl}/api/mockApi/store`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

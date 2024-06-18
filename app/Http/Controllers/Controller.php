@@ -10,4 +10,13 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    protected $appUrl;
+    protected $appPort;
+
+    public function __construct()
+    {
+        $this->appUrl = env('APP_URL');
+        $this->appPort = env('APP_PORT');
+    }
 }

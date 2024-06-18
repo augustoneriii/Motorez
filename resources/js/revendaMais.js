@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('table-search');
     const vehicleList = document.getElementById('vehicle-list');
     const importButton = document.getElementById('import-button');
-
+    const appUrl = window.appUrl;
+    const appPort = window.appPort;
 
     searchInput.addEventListener('input', function () {
         const searchText = searchInput.value.toLowerCase();
@@ -14,23 +15,23 @@ document.addEventListener('DOMContentLoaded', function () {
             row.style.display = found ? '' : 'none';
         });
     });
-
+    //ok
     function createToast(message, status) {
         const toast = document.createElement('div');
         toast.className = `flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800`;
         toast.innerHTML = `
-    <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${status.color} rounded-lg">
-        ${status.icon}
-        <span class="sr-only">${status.label} icon</span>
-    </div>
-    <div class="ms-3 text-sm font-normal">${message}</div>
-    <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentNode.remove()">
-        <span class="sr-only">Close</span>
-        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-        </svg>
-    </button>
-            `;
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${status.color} rounded-lg">
+                ${status.icon}
+                <span class="sr-only">${status.label} icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">${message}</div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentNode.remove()">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        `;
         document.getElementById('toast-container').appendChild(toast);
     }
 
@@ -50,9 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
     function checkVehicleExistence(vehicle) {
-        fetch(`http://127.0.0.1:8000/vehicles/check/${vehicle.getElementsByTagName('codigoVeiculo')[0].textContent}`)
+        fetch(`${appUrl}/vehicles/check/${vehicle.id}`)
             .then(response => response.json())
             .then(data => {
                 console.log('Veículo já existe:', data.exists);
@@ -61,124 +61,131 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Erro ao verificar existência do veículo:', error));
     }
 
-
     function addVehicleToTable(vehicle, exists) {
-        let opcionais = vehicle.getElementsByTagName('opcional');
-        let opcionaisList = [];
-        for (let j = 0; j < opcionais.length; j++) {
-            opcionaisList.push(opcionais[j].textContent);
-        }
         let row = `<tr>
                 <td class="py-2 px-4 border-b">
                     ${exists ?
                 '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'}
                 </td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('codigoVeiculo')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('marca')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('modelo')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('ano')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('versao')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('cor')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('tipoCombustivel')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('quilometragem')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('cambio')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('portas')[0].textContent}</td>
-                <td class="py-2 px-4 border-b">${vehicle.getElementsByTagName('precoVenda')[0].textContent}</td>
+                <td class="py-2 px-4 border-b">${vehicle.marca}</td>
+                <td class="py-2 px-4 border-b">${vehicle.modelo}</td>
+                <td class="py-2 px-4 border-b">${vehicle.ano}</td>
+                <td class="py-2 px-4 border-b">${vehicle.versao}</td>
+                <td class="py-2 px-4 border-b">${vehicle.cor}</td>
+                <td class="py-2 px-4 border-b">${vehicle.tipoCombustivel}</td>
+                <td class="py-2 px-4 border-b">${vehicle.quilometragem}</td>
+                <td class="py-2 px-4 border-b">${vehicle.cambio}</td>
+                <td class="py-2 px-4 border-b">${vehicle.portas}</td>
+                <td class="py-2 px-4 border-b">${vehicle.precoVenda}</td>
                 <td class="py-2 px-4 border-b">
                     <ul>
-                        ${opcionaisList.map(opcional => `<li>${opcional}</li>`).join('')}
+                        ${vehicle.opcionais.map(opcional => `<li>${opcional}</li>`).join('')}
                     </ul>
                 </td>
             </tr>`;
         document.getElementById('vehicle-list').insertAdjacentHTML('beforeend', row);
     }
 
+    function fetchAndParseVehicles(url) {
+        return fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(data, "application/xml");
+                let vehicles = xmlDoc.getElementsByTagName("veiculo");
 
-    fetch('http://127.0.0.1:8000/api/estoque')
-        .then(response => response.text())
-        .then(data => {
-            let parser = new DOMParser();
-            let xmlDoc = parser.parseFromString(data, "text/xml");
+                let vehicleArray = [];
+                for (let i = 0; i < vehicles.length; i++) {
+                    let vehicle = vehicles[i];
 
-            let vehicles = xmlDoc.getElementsByTagName("veiculo");
-            let vehicleList = document.getElementById('vehicle-list');
+                    let getTextContent = (tag) => {
+                        let element = vehicle.getElementsByTagName(tag)[0];
+                        return element ? element.textContent : '';
+                    };
+
+                    let opcionais = Array.from(vehicle.getElementsByTagName('opcional')).map(opcional => opcional.textContent);
+
+                    vehicleArray.push({
+                        id: getTextContent('codigoVeiculo'),
+                        marca: getTextContent('marca'),
+                        modelo: getTextContent('modelo'),
+                        ano: getTextContent('ano'),
+                        versao: getTextContent('versao'),
+                        cor: getTextContent('cor'),
+                        tipoCombustivel: getTextContent('tipoCombustivel'),
+                        quilometragem: getTextContent('quilometragem'),
+                        cambio: getTextContent('cambio'),
+                        portas: getTextContent('portas'),
+                        precoVenda: getTextContent('precoVenda'),
+                        opcionais: opcionais
+                    });
+                }
+
+                return vehicleArray;
+            })
+            .catch(error => console.error('Erro ao buscar os dados da API:', error));
+    }
+
+    fetchAndParseVehicles(`${appUrl}/api/estoque`)
+        .then(vehicles => {
             vehicleList.innerHTML = '';
-
-            for (let i = 0; i < vehicles.length; i++) {
-                let vehicle = vehicles[i];
+            vehicles.forEach(vehicle => {
                 checkVehicleExistence(vehicle);
-            }
+            });
         })
         .catch(error => console.error('Erro ao buscar os dados da API:', error));
+
 
     importButton.addEventListener('click', function () {
         let modal = document.getElementById('modalImport');
         modal.classList.remove('hidden');
 
-        let vehicleData = [];
-        let promises = [];
-
-        fetch('http://127.0.0.1:8000/api/v1/estoque')
-            .then(response => response.text())
-            .then(data => {
-                let parser = new DOMParser();
-                let xmlDoc = parser.parseFromString(data, "text/xml");
-                let vehicles = xmlDoc.getElementsByTagName("veiculo");
-
-                for (let i = 0; i < vehicles.length; i++) {
-                    let vehicle = vehicles[i];
-                    let veiculo = {
-                        id: vehicle.getElementsByTagName('codigoVeiculo')[0]?.textContent.trim(),
-                        marca: vehicle.getElementsByTagName('marca')[0]?.textContent.trim(),
-                        modelo: vehicle.getElementsByTagName('modelo')[0]?.textContent.trim(),
-                        ano: vehicle.getElementsByTagName('ano')[0]?.textContent.trim(),
-                        versao: vehicle.getElementsByTagName('versao')[0]?.textContent.trim(),
-                        cor: vehicle.getElementsByTagName('cor')[0]?.textContent.trim(),
-                        combustivel: vehicle.getElementsByTagName('tipoCombustivel')[0]?.textContent.trim(),
-                        km: vehicle.getElementsByTagName('quilometragem')[0]?.textContent.trim(),
-                        cambio: vehicle.getElementsByTagName('cambio')[0]?.textContent.trim(),
-                        portas: vehicle.getElementsByTagName('portas')[0]?.textContent.trim(),
-                        preco: vehicle.getElementsByTagName('precoVenda')[0]?.textContent.trim(),
-                        origem: 'Revenda Mais',
-                        opcionais: Array.from(vehicle.getElementsByTagName('opcional')).map(opcional => opcional.textContent.trim())
-                    };
-                    vehicleData.push(veiculo);
-                }
-
-                console.log(vehicleData);  // Verifique se os dados estão sendo coletados corretamente
-
-                let vehiclePromise = fetch('http://127.0.0.1:8000/api/mockApi/store', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify(vehicleData)
-                }).then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            showToastError(errorData.message);
-                            throw new Error(errorData.message);
-                        });
-                    }
-                    showToastSuccess();
-                    return response.json();
-                }).catch(error => {
-                    console.error('Erro ao importar os dados:', error);
+        fetchAndParseVehicles(`${appUrl}/api/estoque`)
+            .then(vehicles => {
+                let promises = vehicles.map(vehicle => {
+                    vehicle.origem = 'Revenda Mais';
+                    return fetch(`${appUrl}/api/mockApi/store`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: vehicle.id,
+                            marca: vehicle.marca,
+                            modelo: vehicle.modelo,
+                            ano: parseInt(vehicle.ano),
+                            combustivel: vehicle.tipoCombustivel,
+                            km: parseInt(vehicle.quilometragem),
+                            preco: parseFloat(vehicle.precoVenda),
+                            origem: vehicle.origem
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    showToastError(errorData.message);
+                                    throw new Error(errorData.message);
+                                });
+                            }
+                            showToastSuccess();
+                            return response.json();
+                        })
                 });
 
-                promises.push(vehiclePromise);
+                Promise.all(promises)
+                    .then(() => {
+                        window.location.href = '/vehicles';
+                        console.log('Todos os dados importados com sucesso!');
+                    })
+                    .catch(error => console.error('Erro ao importar todos os dados:', error));
             })
-            .catch(error => console.error('Erro ao buscar os dados da API:', error));
-
-        Promise.all(promises)
             .then(() => {
-                // window.location.href = '/vehicles';
                 console.log('Todos os dados importados com sucesso!');
             })
-            .catch(error => console.error('Erro ao importar todos os dados:', error));
+            .catch(error => console.error('Erro ao importar os dados:', error))
+            .finally(() => {
+                modal.classList.add('hidden');
+            });
 
-        modal.classList.add('hidden');
     });
-
 });

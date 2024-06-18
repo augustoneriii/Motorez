@@ -81,7 +81,10 @@
         </div>
     </div>
 </div>
-
+<script>
+    window.appUrl = "{{ $appUrl }}";
+    window.appPort = "{{ $appPort }}";
+</script>
 <script src="{{ asset('js/WebMotors.js') }}"></script>
 
 @endsection

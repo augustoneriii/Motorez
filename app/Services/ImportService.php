@@ -11,10 +11,14 @@ use Illuminate\Support\Facades\Http;
 class ImportService
 {
     protected $vehicle;
+    protected $appUrl;
+    protected $appPort;
 
-    public function __construct()
+    public function __construct($appUrl, $appPort)
     {
         $this->vehicle = new Vehicle();
+        $this->appUrl = $appUrl;
+        $this->appPort = $appPort;
     }
 
     public function validateVehicle($id)
@@ -24,8 +28,6 @@ class ImportService
 
     public function Import($request)
     {
-        // $response = Http::get('http://127.0.0.1:8000/api/v1/estoque');
-
         $idExternal = $request->input('id');
         $isValid = $this->validateVehicle($idExternal);
 
