@@ -10,6 +10,6 @@ class Vehicle extends Model
     use HasFactory;
 
     protected $fillable = [
-        'marca', 'modelo', 'ano', 'combustivel', 'km', 'preco'
+        'idExternal', 'marca', 'modelo', 'ano', 'combustivel', 'km', 'preco', 'origem'
     ];
 }

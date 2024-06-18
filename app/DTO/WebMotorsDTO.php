@@ -1,6 +1,5 @@
 <?php
-
-namespace App\DTOs;
+namespace App\DTO;
 
 class WebMotorsDTO
 {
@@ -8,42 +7,34 @@ class WebMotorsDTO
     public $marca;
     public $modelo;
     public $ano;
-    public $versao;
-    public $cor;
-    public $km;
     public $combustivel;
-    public $cambio;
-    public $portas;
+    public $km;
     public $preco;
-    public $date;
-    public $opcionais;
+    public $origem;
 
-    public function __construct($data)
+    public function __construct($id = null, $marca = null, $modelo = null, $ano = null, $combustivel = null, $km = null, $preco = null, $origem = null)
     {
-        $this->id = $data['id'];
-        $this->marca = $data['marca'];
-        $this->modelo = $data['modelo'];
-        $this->ano = $data['ano'];
-        $this->versao = $data['versao'];
-        $this->cor = $data['cor'];
-        $this->km = $data['km'];
-        $this->combustivel = $data['combustivel'];
-        $this->cambio = $data['cambio'];
-        $this->portas = $data['portas'];
-        $this->preco = $data['preco'];
-        $this->date = $data['date'];
-        $this->opcionais = $data['opcionais'];
+        $this->id = $id;
+        $this->marca = $marca;
+        $this->modelo = $modelo;
+        $this->ano = $ano;
+        $this->combustivel = $combustivel;
+        $this->km = $km;
+        $this->preco = $preco;
+        $this->origem = $origem;
     }
 
-    public static function fromArray(array $data): WebMotorsDTO
+    public static function fromArray(array $data)
     {
-        return new self($data);
-    }
-
-    public static function fromCollection(array $collection): array
-    {
-        return array_map(function ($item) {
-            return self::fromArray($item);
-        }, $collection);
+        return new self(
+            $data['id'] ?? null,
+            $data['marca'] ?? null,
+            $data['modelo'] ?? null,
+            $data['ano'] ?? null,
+            $data['combustivel'] ?? null,
+            $data['km'] ?? null,
+            $data['preco'] ?? null,
+            $data['origem'] ?? null
+        );
     }
 }

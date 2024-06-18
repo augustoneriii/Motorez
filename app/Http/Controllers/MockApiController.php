@@ -1,10 +1,20 @@
 <?php
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Models\Vehicle;
 use Illuminate\Http\Response;
+use App\Services\ImportService;
+use App\DTO\WebMotorsDTO;
 
 class MockApiController extends Controller
 {
+    public function store(Request $request)
+    {
+        $importService = new ImportService();
+        return $importService->Import($request);
+    }
+
     public function webmotors()
     {
         $data = [

@@ -1,0 +1,19 @@
+CREATE DATABASE motorez;
+
+USE motorez;
+
+CREATE TABLE vehicles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idExternal INT,
+    marca VARCHAR(255) NOT NULL,
+    modelo VARCHAR(255) NOT NULL,
+    ano YEAR NOT NULL,
+    combustivel VARCHAR(255) NOT NULL,
+    km INT NOT NULL,
+    preco DECIMAL(10, 2) NOT NULL,
+    origem VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+

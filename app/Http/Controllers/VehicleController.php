@@ -19,18 +19,24 @@ class VehicleController extends Controller
     {
         $query = Vehicle::query();
 
-        if ($request->has('marca')) {
-            $query->where('marca', $request->input('marca'));
-        }
-        if ($request->has('modelo')) {
-            $query->where('modelo', $request->input('modelo'));
-        }
-        if ($request->has('ano')) {
-            $query->where('ano', $request->input('ano'));
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('marca', 'LIKE', '%' . $search . '%')
+                    ->orWhere('modelo', 'LIKE', '%' . $search . '%')
+                    ->orWhere('ano', 'LIKE', '%' . $search . '%')
+                    ->orWhere('origem', 'LIKE', '%' . $search . '%');
+            });
         }
 
         $vehicles = $query->paginate(10);
         return view('vehicles.index', compact('vehicles'));
+    }
+
+    public function checkIfExists($idExternal)
+    {
+        $exists = Vehicle::where('idExternal', $idExternal)->exists();
+        return response()->json(['exists' => $exists]);
     }
 
     public function create()
@@ -41,26 +47,22 @@ class VehicleController extends Controller
     public function store(Request $request)
     {
         try {
-            $vehicles = $request->input('vehicles');
-            
-            foreach ($vehicles as $vehicleData) {
-                $dto = WebMotorsDTO::fromArray($vehicleData);
-                $this->vehicle->create([
-                    'marca' => $dto->marca,
-                    'modelo' => $dto->modelo,
-                    'ano' => $dto->ano,
-                    'combustivel' => $dto->combustivel,
-                    'km' => $dto->km,
-                    'preco' => $dto->preco
-                ]);
+            $created = $this->vehicle->create([
+                'marca' => $request->input('marca'),
+                'modelo' => $request->input('modelo'),
+                'ano' => $request->input('ano'),
+                'combustivel' => $request->input('combustivel'),
+                'km' => $request->input('km'),
+                'preco' => $request->input('preco'),
+                'origem' => $request->input('origem')
+            ]);
+            if ($created) {
+                return redirect()->route('vehicles.index')->with('success', 'Veículo criado com sucesso!');
             }
-    
-            return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return back()->with('error', 'Erro ao criar veículo: ' . $e->getMessage());
         }
     }
-    
 
     public function show(Vehicle $vehicle)
     {
@@ -93,31 +95,6 @@ class VehicleController extends Controller
     {
         return view('api.webmotors');
     }
-
-    public function insertWebMotors(Request $request)
-    {
-        dd($request->all());
-        $vehicles = $request->input('vehicles');
-        $webMotorsDAO = new VehicleDAO();
-        $webMotorsDTOs = [];
-
-        foreach ($vehicles as $vehicleData) {
-            $dto = WebMotorsDTO::fromArray($vehicleData);
-            $webMotorsDTOs[] = $dto;
-
-            $this->vehicle->create([
-                'marca' => $dto->marca,
-                'modelo' => $dto->modelo,
-                'ano' => $dto->ano,
-                'combustivel' => $dto->combustivel,
-                'km' => $dto->km,
-                'preco' => $dto->preco
-            ]);
-        }
-
-        $webMotorsDAO->insertWebMotors($webMotorsDTOs);
-        return response()->json(['success' => true]);
-    }   
 
     public function getRevendaMais()
     {

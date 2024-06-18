@@ -2,47 +2,63 @@
 namespace App\Services;
 
 use App\Models\Vehicle;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\DTO\WebMotorsDTO;
 use Illuminate\Support\Facades\Http;
 
 class ImportService
 {
-    public function importWebMotors()
-    {
-        $response = Http::get('http://127.0.0.1:8000/api/v1/estoque');
-        $vehicles = $response->json('veiculos');
+    protected $vehicle;
 
-        foreach ($vehicles as $data) {
-            Vehicle::updateOrCreate(
-                ['id' => $data['id']],
-                [
-                    'marca' => $data['marca'],
-                    'modelo' => $data['modelo'],
-                    'ano' => $data['ano'],
-                    'combustivel' => $data['combustivel'],
-                    'km' => $data['km'],
-                    'preco' => $data['preco']
-                ]
-            );
-        }
+    public function __construct()
+    {
+        $this->vehicle = new Vehicle();
     }
 
-    public function importRevendaMais()
+    public function validateVehicle($id)
     {
-        $response = Http::get('http://127.0.0.1:8000/api/estoque');
-        $vehicles = simplexml_load_string($response->body())->veiculos->veiculo;
+        return $this->vehicle->where('idExternal', $id)->exists();
+    }
 
-        foreach ($vehicles as $data) {
-            Vehicle::updateOrCreate(
-                ['id' => (int)$data->codigoVeiculo],
-                [
-                    'marca' => (string)$data->marca,
-                    'modelo' => (string)$data->modelo,
-                    'ano' => (int)$data->ano,
-                    'combustivel' => (string)$data->tipoCombustivel,
-                    'km' => (int)$data->quilometragem,
-                    'preco' => (float)$data->precoVenda
-                ]
-            );
+    public function Import($request)
+    {
+        // $response = Http::get('http://127.0.0.1:8000/api/v1/estoque');
+
+        $idExternal = $request->input('id');
+        $isValid = $this->validateVehicle($idExternal);
+
+        if ($isValid) {
+            return response()->json(['message' => 'Veículo já cadastrado'], 400);
         }
+
+        $dto = WebMotorsDTO::fromArray([
+            'id' => $request->input('id'),
+            'marca' => $request->input('marca', 'Sem marca registrada'),
+            'modelo' => $request->input('modelo', 'Sem modelo registrado'),
+            'ano' => $request->input('ano', 0),
+            'combustivel' => $request->input('combustivel', 'Sem combustível registrado'),
+            'km' => $request->input('km', 0),
+            'preco' => $request->input('preco', 0),
+            'origem' => $request->input('origem', 'Sem origem registrada')
+        ]);
+
+        $created = $this->vehicle->create([
+            'idExternal' => $dto->id,
+            'marca' => $dto->marca,
+            'modelo' => $dto->modelo,
+            'ano' => $dto->ano,
+            'combustivel' => $dto->combustivel,
+            'km' => $dto->km,
+            'preco' => $dto->preco,
+            'origem' => $dto->origem
+        ]);
+
+        if (!$created) {
+            return response()->json(['message' => 'Erro ao cadastrar veículo'], 500);
+        }
+
+        return response()->json(['message' => 'Veículo cadastrado com sucesso'], 201);
     }
 }
