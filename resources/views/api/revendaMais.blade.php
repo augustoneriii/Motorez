@@ -36,7 +36,6 @@
                     <th class="py-2 px-4 border-b">Câmbio</th>
                     <th class="py-2 px-4 border-b">Portas</th>
                     <th class="py-2 px-4 border-b">Preço</th>
-                    <th class="py-2 px-4 border-b">Data</th>
                     <th class="py-2 px-4 border-b">Opcionais</th>
                 </tr>
             </thead>
